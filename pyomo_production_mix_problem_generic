@@ -1,0 +1,438 @@
+---
+title: "Mix de Produção - Abordagem Concreta"
+format: html
+---
+
+# Problema
+
+(Belfiore e Fávero) A empresa Venix de brinquedos está revendo seu planejamento de produção de carrinhos e triciclos:
+
+-   O lucro líquido por unidade de carrinho e triciclo produzido é de R\$12 e R\$60, respectivamente.
+
+-   As matérias primas e os insumos necessários para a fabricação de cada um dos produtos são terceirizados, cabendo à empresa os processos de usinagem, pintura e montagem.
+
+-   O processo de usinagem requer 15 minutos de mão de obra especializada por unidade de carrinho e 30 minutos por unidade de triciclo produzida.
+
+-   O processo de pintura requer 6 minutos de mão de obra especializada por unidade de carrinho e 45 minutos por unidade de triciclo produzida.
+
+-   Já o processo de montagem necessita de 6 minutos e 24 minutos para uma unidade de carrinho e de triciclo produzida, respectivamente.
+
+-   O tempo disponível por semana é de 36, 22 e 15 horas para os processos de usinagem, pintura e montagem, respectivamente.
+
+A empresa quer determinar quanto produzir de cada produto por semana, respeitando as limitações de recursos, de forma a maximizar o lucro líquido semanal. Formular o problema de programação linear que maximiza o lucro líquido da empresa Venix.
+
+## Resumo do lucro por produto:
+
+|             | carrinho | triciclo |
+|-------------|----------|----------|
+| Lucro (R\$) | 12       | 60       |
+
+## Conversão do problema para uma unidade padrão (horas):
+
+| Processo | carrinho      | triciclo     | disponibildade |
+|----------|---------------|--------------|----------------|
+| Usinagem | 0,25h (15min) | 0,5h (30min) | 36h            |
+| Pintura  | 0,1h (6min)   | 0,75h(45min) | 22h            |
+| Montagem | 0,1h (6min)   | 0,4h (24min) | 15h            |
+
+# Representação matricial
+
+## Função objetivo
+
+$\max z = \mathbf{c}^T\mathbf{x}$
+
+Maximizar o produto entre o vetor de lucros unitários $\mathbf{c}$ e o vetor de quantidades a produzir $\mathbf{x}$ (produto escalar entre $\mathbf{c}^T$ e $\mathbf{x}^n$ )
+
+O termo $\mathbf{c}^T\mathbf{x}$ é a soma ponderada dos lucros, ou seja, nesse caso é a mesma coisa que $12x_1 + 60x_2$. Essa seria a visão matricial:
+
+$\mathbf{c} =
+\begin{bmatrix}
+12 \\[4pt]
+60
+\end{bmatrix},
+\quad
+\mathbf{x} =
+\begin{bmatrix}
+x_1 \\[4pt]
+x_2
+\end{bmatrix}$
+
+## Restrições
+
+### Restrição 1:
+
+$\mathbf{Ax} \leq \mathbf{b}$
+
+O produto matricial $\mathbf{Ax}$ representa o consumo total de horas em cada processo (usinagem, pintura e montagem), calculado como a soma das horas necessárias por produto multiplicadas pelas quantidades produzidas.
+
+Cada linha de $\mathbf{Ax} \leq \mathbf{b}$ garante que o tempo utilizado em cada processo não excede a disponibilidade total de horas presente no vetor coluna de disponibilidades $\mathbf{b}$. A visão matricial seria assim:\
+
+$\mathbf{A} =
+\begin{bmatrix}
+0.25 & 0.50 \\[4pt]
+0.10 & 0.75 \\[4pt]
+0.10 & 0.40
+\end{bmatrix},
+\quad
+\mathbf{b} =
+\begin{bmatrix}
+36 \\[4pt]
+22 \\[4pt]
+15
+\end{bmatrix}$
+
+### Restrição 2:
+
+$\mathbf{x} \geq \mathbf{0}$
+
+O vetor X não pode ser negativo. Não tem como produzir uma quantidade negativa de produtos.
+
+# Representação Genérica
+
+## Índices / Conjuntos:
+
+$I \colon \{1, \ldots, m\}$
+
+$I:$ Conjunto dos recursos ou processos produtivos (usinagem, puntura, montagem). Cada elemento $i \in I$ representa um tipo de recurso com disponibilidade limitada.
+
+$J \colon \{1, \ldots n\}$
+
+$J:$Conjunto dos produtos a serem fabricados (carrinhos e triciclos). Cada elementa $j \in J$ representa um produto que consome os recursos do conjunto $I$.
+
+## Parâmetros:
+
+(tudo que já sabemos antes de resolver o problema)
+
+$c_j \colon \text{lucro líquido por unidade do produto } j \in J \text{ produzido}$
+
+(Retorno financeiro de cada produto)
+
+$a_{ij} \colon \text{quantidade de horas necessárias para a execução do processo } i \in I \text{ na fabricação do produto } j \in J$
+
+(representa o consumo unitário de cada recurso por produto)
+
+$b_i \colon \text{quantidade de horas disponíveis para execução do processo } i \in I$
+
+(capacidade maxima disponível do recurso $i$ )
+
+## Variáveis de decisão:
+
+$x_j \colon \text{quantidade a ser fabricada do produto } j \in J \text{ por semana}$
+
+(Decisões que o modelo deve tomar, ou seja, quanto produzir de cada item para maximizar o lucro)
+
+## Modelo matemático:
+
+### Função Objetivo:
+
+$\max z = \sum_{j\in J} c_j x_j$
+
+( maximiza o lucro total obtido pela soma dos lucros individuais $c_j x_j$ )
+
+A leitura direta seria: maximizar o lucro total $z$, que é a soma para todos os projutos ${j\in J}$ , do lucro por unicade $c_j$ multiplicado pela quantidade produzida $x_j$
+
+### Restrições:
+
+sujeito a:
+
+#### Restrição 1:
+
+$\sum\limits_{j \in J} a_{ij} x_{j} \leq b_{i}, \;\; \forall \; i \in I$
+
+Para cada recurso $i \in I$, o consumo total desse recurso (soma de $a_{ij}x_j$ sobre todos os produtos $j$ ) não pode ultrapassar a disponibilidade $b_i$.
+
+![](images/explicação_restricao_modelo_generico_mix_produtos.png){fig-align="center"}
+
+#### Restrição 2:
+
+$x_{j} \geq 0 \;\; \forall j \in J$
+
+A quantidade prozuida de cada projuto $j$ deve ser nã onegativa (não tem como produzir uma quantidade menor que zero). Isso vale para todo $j$ pertencente ao conjunto $J$ .
+
+# Entrada de dados
+
+```{python}
+# vetor de lucros
+c_vetor_de_lucros = [12, 60] 
+
+# matriz A: horas por atividade para cada produto
+a_matriz = [[0.25, 0.5], 
+     [0.1, 0.75], 
+     [0.1, 0.4]]
+
+# vetor de disponibilidade máxima de horas por semana
+b_vetor_de_lim_horas = [36, 22, 15]
+
+# quantidade de itens do índice I
+m_total_indices_i = len(b_vetor_de_lim_horas)
+
+# quantidade de itens que fabrico
+n_total_produtos = len(c_vetor_de_lucros)
+```
+
+# Resolução do problema
+
+## 1. Importar bibliotecas
+
+```{python}
+import pyomo.environ as pyo
+```
+
+## 2. Importar e definir solver que será usado
+
+```{python}
+solver = pyo.SolverFactory("glpk")
+```
+
+## 3. Declarar o modelo
+
+```{python}
+modelo = pyo.ConcreteModel()
+```
+
+## 4. Declarar índices, parâmetros e variáveis de decisão
+
+### 4.1 Índices
+
+```{python}
+# 4.1 Índices
+modelo.Conj_I_Processos = range(m_total_indices_i)
+modelo.Conj_J_Produtos = range(n_total_produtos)
+
+```
+
+### 4.2 Parâmetros
+
+A função `initialize` do `Param` espera um **mapeamento entre índices e valores**.
+
+Esse mapeamento pode ser criado dinamicamente (com lambda) ou explicitamente (com um dicionário).
+
+No exemplo \[opção 3\] do parâmetro 1 construímos primeiro o dicionário `dict_c_lucro`, onde cada índice j do conjunto `Conj_J_Produtos` é associado ao lucro c_vetor_de_lucros\[j\].
+
+Isso deixa claro que o parâmetro `c_lucro[j]` nada mais é do que uma forma simbólica de acessar os valores guardados no dicionário `{0: 12, 1: 60}` dentro do Pyomo.
+
+#### Parâmetro 1: c
+
+$c_j \colon \text{lucro liquido por unidade do produto } j \in J \text{ produzido}$
+
+```{python}
+# 4.2 Parâmetros
+
+# opção 1: usando lambda
+#modelo.c_lucro = pyo.Param(
+#  modelo.Conj_J_Produtos, 
+#  initialize = lambda modelo,  j: c_vetor_de_lucro[j]
+#)
+
+# opção 2: criando o dicionário direto no argumento initialize
+#modelo.c_lucro = pyo.Param(
+#  modelo.Conj_J_Produtos,
+#  initialize = {j: c_vetor_de_lucros[j] for j in modelo.Conj_J_Produtos}
+#)
+
+# opção 3: criar o dicionário antes
+dict_c_lucro = {j: c_vetor_de_lucros[j] for j in modelo.Conj_J_Produtos}
+
+modelo.c_lucro = pyo.Param(
+  modelo.Conj_J_Produtos,
+  initialize = dict_c_lucro
+)
+```
+
+#### Parâmetro 2: a
+
+$a_{ij} \colon \text{quantidade de horas necessarias para a execucao do processo } i \in I \text{ na fabricacao do produto } j \in J$
+
+O parâmetro $a_{ij}$ é uma matriz de coeficientes que relaciona cada processo i com cada produto j.
+
+No Pyomo, representamos essa estrutura como um dicionário de pares (i, j) mapeados para seus respectivos valores.
+
+Essa representação explicita a relação a\[i\]\[j\] → (i, j): valor e deixa claro que o Pyomo interpreta o Param como um mapeamento entre índices e valores.
+
+```{python}
+
+# Monta um dicionário com chaves duplas (i, j)
+# representando o tempo de cada processo i para cada produto j
+dict_a_matriz = {
+  (i, j): a_matriz[i][j] for i in modelo.Conj_I_Processos for j in modelo.Conj_J_Produtos
+}
+
+# enxergando o dicionário
+print("Dicionário de coeficientes a_ij:")
+for chave, valor in dict_a_matriz.items():
+    print(f"a{chave} = {valor}")
+
+# estabelecendo o parâmetro
+modelo.a_matriz = pyo.Param(
+  modelo.Conj_I_Processos, # índice 1 (linhas da matriz)
+  modelo.Conj_J_Produtos,  # índice 2 (colunas da matriz)
+  initialize = dict_a_matriz
+)
+
+```
+
+#### Parâmetro 3:  bi
+
+$b_i \colon \text{quantidade de horas disponiveis para execucao do processo } i \in I$
+
+O parâmetro $b_i$ representa o total de horas disponíveis em cada processo $i$.
+
+Para tornar o código mais claro, primeiro convertemos o vetor b do Python em um dicionário `dict_b_horas_limite`, onde cada índice i é mapeado ao seu valor correspondente `b[i]`.
+
+Em seguida, passamos esse dicionário para o Pyomo com o argumento `initialize`.
+
+O Pyomo então interpreta esse mapeamento e cria o parâmetro simbólico `b[i]` dentro do modelo.
+
+```{python}
+
+# criar um dicionário que associada cada processo i à sua disponibilidade b[i]
+dict_b_horas_limite = {i: b_vetor_de_lim_horas[i] for i in modelo.Conj_I_Processos}
+
+# estabelecendo o parâmetro
+modelo.b_horas_limite = pyo.Param(
+  modelo.Conj_I_Processos, # está associado ao índice i (bi)
+  initialize = dict_b_horas_limite
+)
+
+```
+
+Visualizando cada parâmetro:
+
+```{python}
+# checando a saída dos parâmetros:
+
+# parâmetro c_lucro:
+print("\n" + "="*40) # printa '=' 40 vezes e faz uma qubera de linha
+for j in modelo.Conj_J_Produtos:
+    print(f"Produto {j}: lucro = R$ {modelo.c_lucro[j]}")
+
+# parâmetro a_matriz:
+print("\n" + "="*40)
+for i in modelo.Conj_I_Processos:
+    for j in modelo.Conj_J_Produtos:
+        print(f"Processo {i}, Produto {j}: a_ij = {modelo.a_matriz[i, j]} horas")
+
+# parâmetro b_horas_limite:
+print("\n" + "="*40)
+for b in modelo.Conj_I_Processos:
+  print(f"Processo {b}: Disponibilidade total: {modelo.b_horas_limite[b]} horas")
+```
+
+### 4.3 Variáveis de decisão
+
+$x_j \colon \text{quantidade a ser fabricada do produto } j \in J \text{ por semana}$
+
+```{python}
+modelo.x_variaveis = pyo.Var(
+  modelo.Conj_J_Produtos,  # as variáveis estão associadas ao índice J
+  within = pyo.NonNegativeReals
+)
+
+
+```
+
+## 5. Declarar Função Objetivo
+
+$\max z = \sum_{j\in J} c_j x_j$
+
+```{python}
+
+# versão compacta
+#def regra_z(modelo_alvo):
+#  return pyo.summation(modelo_alvo.c_lucro, modelo_alvo.x_variaveis)
+
+# versão didática
+def regra_z(modelo_alvo):
+    # Calcula o lucro total como a soma de (lucro unitário × quantidade produzida)
+    lucro_total = sum(
+        modelo_alvo.c_lucro[j] * modelo_alvo.x_variaveis[j]
+        for j in modelo_alvo.Conj_J_Produtos
+    )
+    
+    # Opcional: imprimir para conferir os termos da função objetivo
+    for j in modelo_alvo.Conj_J_Produtos:
+        print(f"Produto {j}: {modelo_alvo.c_lucro[j]} × {modelo_alvo.x_variaveis[j]}")
+
+    return lucro_total
+  
+modelo.z = pyo.Objective(
+  rule = regra_z,
+  sense = pyo.maximize
+)
+```
+
+## 6. Declarar restrições
+
+$\sum\limits_{j \in J} a_{ij} x_{j} \leq b_{i}, \;\; \forall \; i \in I$
+
+```{python}
+
+# versão compacta
+#def regra_disp_mo(mod, i):
+#    return sum(mod.a[i,j] * mod.x[j] for j in mod.J) <= mod.b[i]
+
+
+def regra_disp_mo(modelo_alvo, i):
+    # Calcula o total de horas utilizadas no processo i
+    horas_usadas = sum(modelo_alvo.a_matriz[i, j] * modelo_alvo.x_variaveis[j] for j in modelo_alvo.Conj_J_Produtos)
+    
+    # Opcional: imprimir os termos da restrição
+    print(f"\n🔹 Restrição do processo {i}:")
+    for j in modelo_alvo.Conj_J_Produtos:
+        print(f"  a_matriz[{i},{j}] * x_variaveis[{j}] = {modelo_alvo.a_matriz[i,j]} * x{j}")
+    
+    # Retorna a restrição simbólica: soma das horas usadas <= limite de horas
+    return horas_usadas <= modelo_alvo.b_horas_limite[i]
+
+
+modelo.restri_disp = pyo.Constraint(
+  modelo.Conj_I_Processos,
+  rule = regra_disp_mo
+)
+
+```
+
+## 7. Resolver modelo
+
+Antes de resolver, o modelo será printado no console pela função `pprint`. Nesse caso é possível rodar essa função sem problemas porque o modelo é muito pequeno. Caso fosse um problema real com centenas de variáveis e restrições, não seria factíve rodar esse código.
+
+```{python}
+modelo.pprint()
+```
+
+Resolver o modelo:
+
+```{python}
+resultado = solver.solve(modelo)
+```
+
+Resultados brutos do modelo:
+
+```{python}
+resultado.write
+```
+
+Organizando o print com a saída do modelo:
+
+```{python}
+print("\n===== RESULTADOS DO MODELO =====")
+
+# Status e condição de término
+print(f"Status da otimização: {resultado.solver.status}")
+print(f"Condição de término: {resultado.solver.termination_condition}")
+
+# Função objetivo
+print(f"Lucro máximo (z) = R${pyo.value(modelo.z):.2f}")
+
+# Variáveis de decisão
+print("\n📦 Quantidades ótimas a produzir:")
+for j in modelo.Conj_J_Produtos:
+    print(f"  Produto {j}: x[{j}] = {modelo.x_variaveis[j]():.2f} unidades")
+
+# Restrições
+print("\n⏱️ Verificação das restrições (uso de horas):")
+for i in modelo.Conj_I_Processos:
+    lhs = sum(pyo.value(modelo.a_matriz[i,j]) * modelo.x_variaveis[j]() for j in modelo.Conj_J_Produtos)
+    rhs = pyo.value(modelo.b_horas_limite[i])
+    print(f"  Processo {i}: usado = {lhs:.2f} h | limite = {rhs:.2f} h | folga = {rhs - lhs:.2f} h")
+```

@@ -1,0 +1,166 @@
+---
+title: "Mix de Produção - Abordagem Concreta"
+format: html
+---
+
+# Problema
+
+(Belfiore e Fávero) A empresa Venix de brinquedos está revendo seu planejamento de produção de carrinhos e triciclos.
+
+O lucro líquido por unidade de carrinho e triciclo produzido é de R\$12 e R\$60, respectivamente.
+
+As matérias primas e os insumos necessários para a fabricação de cada um dos produtos são terceirizados, cabendo à empresa os processos de usinagem, pintura e montagem.
+
+O processo de usinagem requer 15 minutos de mão de obra especializada por unidade de carrinho e 30 minutos por unidade de triciclo produzida.
+
+O processo de pintura requer 6 minutos de mão de obra especializada por unidade de carrinho e 45 minutos por unidade de triciclo produzida.
+
+Já o processo de montagem necessita de 6 minutos e 24 minutos para uma unidade de carrinho e de triciclo produzida, respectivamente.
+
+O tempo disponível por semana é de 36, 22 e 15 horas para os processos de usinagem, pintura e montagem, respectivamente.
+
+A empresa quer determinar quanto produzir de cada produto por semana, respeitando as limitações de recursos, de forma a maximizar o lucro líquido semanal. Formular o problema de programação linear que maximiza o lucro líquido da empresa Venix.
+
+## Resumo do lucro por produto:
+
+|             | carrinho | triciclo |
+|-------------|----------|----------|
+| Lucro (R\$) | 12       | 60       |
+
+## Conversão do problema para uma unidade padrão (horas):
+
+| Processo | carrinho      | triciclo     | disponibildade |
+|----------|---------------|--------------|----------------|
+| Usinagem | 0,25h (15min) | 0,5h (30min) | 36h            |
+| Pintura  | 0,1h (6min)   | 0,75h(45min) | 22h            |
+| Montagem | 0,1h (6min)   | 0,4h (24min) | 15h            |
+
+# Formulação
+
+## Variáveis de decisão
+
+$x_1 \colon \text{quantidade de carrinhos a serem produzidos por semana}$
+
+$x_2 \colon \text{quantidade de triciclos a serem produzidos por semana}$
+
+## Formulação matemática
+
+### Função objetivo:
+
+$\text{max }z = 12x_1 + 60x_2$
+
+## Restrições
+
+sujeito a
+
+1.  O tempo total de mão de obra para a atividade de usinagem não pode ultrapassar 36h/ semana:
+
+$0,25x_1 + 0,5x_2 \leq 36$
+
+2.  O tempo total de mão de obra para a atividade de pintura não pode ultrapassar 22h/ semana:
+
+$0,1x_1 + 0,75x_2 \leq 22$
+
+3.  O tempo total de mão de obra para a atividade de montagem não pode ultrapassar 15h/ semana:
+
+$0,1x_1 + 0,4x_2 \leq 15$
+
+4.  As quantidades de carrinhos e triciclos não podem ser negativas:
+
+$x_1, x_2 \geq 0$
+
+# Resolução do problema
+
+## 1. Importar bibliotecas
+
+```{python}
+import pyomo.environ as pyo
+```
+
+## 2. Importar e definir solver que será usado
+
+```{python}
+solver = pyo.SolverFactory("glpk")
+```
+
+## 3. Declarar o modelo
+
+```{python}
+modelo = pyo.ConcreteModel()
+```
+
+## 4. Declarar variáveis de decisão
+
+$x_1 \colon \text{quantidade de carrinhos a serem produzidos por semana}$
+
+$x_2 \colon \text{quantidade de triciclos a serem produzidos por semana}$
+
+$x_1, x_2 \geq 0$
+
+As variáveis não podem ser negativas, isso é representado com o argumento `within` da função `var`
+
+```{python}
+modelo.x1 = pyo.Var(within = pyo.NonNegativeReals)
+modelo.x2 = pyo.Var(within = pyo.NonNegativeReals)
+
+```
+
+## 5. Declarar Função Objetivo
+
+```{python}
+modelo.z = pyo.Objective(
+  expr = 12 * modelo.x1 + 60 * modelo.x2,
+  sense = pyo.maximize
+)
+```
+
+## 6. Declarar restrições
+
+1.  O tempo total de mão de obra para a atividade de usinagem não pode ultrapassar 36h/ semana:
+
+$0,25x_1 + 0,5x_2 \leq 36$
+
+2.  O tempo total de mão de obra para a atividade de pintura não pode ultrapassar 22h/ semana:
+
+$0,1x_1 + 0,75x_2 \leq 22$
+
+3.  O tempo total de mão de obra para a atividade de montagem não pode ultrapassar 15h/ semana:
+
+$0,1x_1 + 0,4x_2 \leq 15$
+
+```{python}
+modelo.restricao_usinagem = pyo.Constraint(expr = 0.25 * modelo.x1 + 0.5 * modelo.x2 <= 36)
+modelo.restricao_pintura = pyo.Constraint(expr = 0.1 * modelo.x1 + 0.75 * modelo.x2 <= 22)
+modelo.restricao_monagem = pyo.Constraint(expr = 0.1 * modelo.x1 + 0.4 * modelo.x2 <= 15)
+```
+
+## 7. Resolver modelo
+
+Antes de resolver, o modelo será printado no console pela função `pprint`. Nesse caso é possível rodar essa função sem problemas porque o modelo é muito pequeno. Caso fosse um problema real com centenas de variáveis e restrições, não seria factíve rodar esse código.
+
+```{python}
+modelo.pprint()
+```
+
+Resolver o modelo:
+
+```{python}
+resultado = solver.solve(modelo)
+```
+
+Resultados brutos do modelo:
+
+```{python}
+resultado.write
+```
+
+Organizando o print com a saída do modelo:
+
+```{python}
+print("\n===== RESULTADOS DO MODELO =====")
+print(f"Status da otimização: {resultado.solver.status}")
+print(f"Condição de término: {resultado.solver.termination_condition}")
+print(f"Lucro máximo (z) = R${pyo.value(modelo.z):.2f}")
+print(f"Carrinhos (x1) = {modelo.x1():.2f} unidades")
+print(f"Triciclos (x2) = {modelo.x2():.2f} unidades")
+```
