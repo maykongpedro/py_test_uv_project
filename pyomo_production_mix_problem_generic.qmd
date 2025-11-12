@@ -271,7 +271,7 @@ modelo.a_matriz = pyo.Param(
 
 ```
 
-#### Parâmetro 3:  bi
+#### Parâmetro 3: bi
 
 $b_i \colon \text{quantidade de horas disponiveis para execucao do processo } i \in I$
 
