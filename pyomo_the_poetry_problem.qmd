@@ -1,9 +1,9 @@
 ---
-title: "Untitled"
+title: "O problema do Poeta"
 format: html
 ---
 
-# O PROBLEMA DO POETA
+# Modelagem descritiva:
 
 O exemplo apresentado a seguir descreve a situação de um poeta que mora há dez anos numa floresta de sua propriedade. Além de escrever poesia, o poeta também maneja sua floresta para obter uma receita adicional para sobreviver. A floresta se divide da seguinte maneira:
 
@@ -26,63 +26,108 @@ Como foi mencionado, o desejo do poeta é maximizar a receita advinda da sua pro
 
 A receita simbolizada por Z pode ser proveniente da floresta de Pinus, ou da floresta nativa, ou de ambas. Portanto, uma opção natural para as variáveis é:
 
--   X1 = número de hectares de floresta de Pinus a serem manejados
--   X2 = número de hectares de floresta nativa a serem manejados
+-   $x_1 \colon \text{número de hectares de floresta de Pinus a serem manejados}$
+
+<!-- -->
+
+-   $x_2 \colon \text{número de hectares de floresta nativas a serem manejadas}$
 
 Estas são as incógnitas. Devem ser examinados os valores possíveis de X1 e X2 para tornar o valor de Z o maior possível.
 
 ## Função objetivo
 
-Função objetivo
-A função objetivo deve expressar a relação existente entre Z, que é a receita gerada pela floresta,
-e as variáveis de decisão X1 e X2. Para obter esta função, é preciso ter uma noção das receitas
-anuais de cada tipo de floresta. Como o poeta recebeu R$ 36.000,00 dos seus 40 ha de floresta
-de Pinus e R$ 60.000,00 dos seus 50 ha de floresta nativa durante os últimos 10 anos, a receita
-anual media foi de R$ 90 por hectare (R$ 90/ha/ano) para a floresta de Pinus, e de R$
-120/ha/ano para a floresta nativa. Utilizando estes valores como medida da receita esperada
-pelo poeta para os próximos anos, a função objetivo pode-se ser escrita como segue:
+Função objetivo A função objetivo deve expressar a relação existente entre Z, que é a receita gerada pela floresta, e as variáveis de decisão X1 e X2. Para obter esta função, é preciso ter uma noção das receitas anuais de cada tipo de floresta. Como o poeta recebeu R\$ 36.000,00 dos seus 40 ha de floresta de Pinus e R\$ 60.000,00 dos seus 50 ha de floresta nativa durante os últimos 10 anos, a receita anual media foi de R\$ 90 por hectare (R\$ 90/ha/ano) para a floresta de Pinus, e de R\$ 120/ha/ano para a floresta nativa. Utilizando estes valores como medida da receita esperada pelo poeta para os próximos anos, a função objetivo pode-se ser escrita como segue:
 
+$\max z = 90x_1 + 120x_2$
 
-Onde as unidades de medida de cada variável e constante aparecem entre parênteses. Uma boa
-prática de modelagem de problemas é verificar minuciosamente a coerência de todas as
-expressões algébricas com respeito a suas unidades de medida. Na função objetivo, Z é expressa
-em reais por ano, de modo que as operações à direita do sinal de igualdade da função objetivo
-devem resultar em reais por ano também, como pode ser verificado.
-Para completar o modelo, deve-se ainda determinar quais restrições limitam as ações do poeta
-de modo a ajudar ele a escrever as mesmas em termos matemáticos referentes às variáveis de
-decisão X1 e X2.
-
+Onde as unidades de medida de cada variável e constante aparecem entre parênteses. Uma boa prática de modelagem de problemas é verificar minuciosamente a coerência de todas as expressões algébricas com respeito a suas unidades de medida. Na função objetivo, Z é expressa em reais por ano, de modo que as operações à direita do sinal de igualdade da função objetivo devem resultar em reais por ano também, como pode ser verificado. Para completar o modelo, deve-se ainda determinar quais restrições limitam as ações do poeta de modo a ajudar ele a escrever as mesmas em termos matemáticos referentes às variáveis de decisão X1 e X2.
 
 ## Restrições de área
-As restrições que talvez sejam as mais simples de entender dizem respeito das áreas a serem
-utilizadas de cada tipo de floresta. Estas áreas não podem ser maiores do que as disponíveis.
-Deste modo, tem-se:
 
-- X1 ≤ 40 ha de floresta de Pinus
-- X2 ≤ 50 ha de floresta nativa
+As restrições que talvez sejam as mais simples de entender dizem respeito das áreas a serem utilizadas de cada tipo de floresta. Estas áreas não podem ser maiores do que as disponíveis. Deste modo, tem-se:
 
-Nas restrições de área pode ser verificado que as unidades nas quais se expressa o lado direito
-das mesmas (ha) são as mesmas que as do lado esquerdo (definição das variáveis X1 e X2).
+-   $x_1 ≤ 40 \text{ ha de floresta de Pinus}$
+-   $x_2 ≤ 50 \text{ ha de floresta nativa}$
+
+Nas restrições de área pode ser verificado que as unidades nas quais se expressa o lado direito das mesmas (ha) são as mesmas que as do lado esquerdo (definição das variáveis X1 e X2).
 
 ## Restrição de tempo
-Quando o poeta manifestou seu desejo de não trabalhar mais do que metade do seu tempo na
-floresta, o que representa grosseiramente 180 dias/ano, deve-se pensar em mais uma restrição.
-Para escrever esta restrição em função das variáveis de decisão, devemos observar que o poeta
-utilizou, nos últimos 10 anos, 800 dias para manejar os 40 ha de floresta de Pinus, o que resulta
-em uma dedicação média de 2 dias por hectare por ano (2 dias/ha/ano). De maneira similar, 3
-dias/ha/ano foi a dedicação média de tempo na floresta nativa, onde ao longo dos últimos 10
-anos foram utilizados 1.500 dias para manejar os 50 ha de floresta nativa.
-Em termos das variáveis de decisão X1 e X2, a expressão que representa o tempo necessário para
-manejar floresta é:
 
- a expressão que limita este tempo para um valor máximo de 180 dias/ano é:
+Quando o poeta manifestou seu desejo de não trabalhar mais do que metade do seu tempo na floresta, o que representa grosseiramente 180 dias/ano, deve-se pensar em mais uma restrição. Para escrever esta restrição em função das variáveis de decisão, devemos observar que o poeta utilizou, nos últimos 10 anos, 800 dias para manejar os 40 ha de floresta de Pinus, o que resulta em uma dedicação média de 2 dias por hectare por ano (2 dias/ha/ano). De maneira similar, 3 dias/ha/ano foi a dedicação média de tempo na floresta nativa, onde ao longo dos últimos 10 anos foram utilizados 1.500 dias para manejar os 50 ha de floresta nativa. Em termos das variáveis de decisão X1 e X2, a expressão que representa o tempo necessário para manejar floresta é:
 
+$$
+2x_1 + 3x_2
+$$
+
+a expressão que limita este tempo para um valor máximo de 180 dias/ano é:
+
+$$
+2x_1 + 3x_2 \leq 180
+$$
 
 ## Condição de não-negatividade
 
-A última restrição necessária para completar a formulação do problema estabelece que nenhuma
-das variáveis pode ser negativa, uma vez que elas referem-se a áreas sob manejo. Deste modo,
-tem-se a seguinte expressão, denominada de condição de não-negatividade:
-X1 ≥ 0 e X2 ≥ 0
+A última restrição necessária para completar a formulação do problema estabelece que nenhuma das variáveis pode ser negativa, uma vez que elas referem-se a áreas sob manejo. Deste modo, tem-se a seguinte expressão, denominada de condição de não-negatividade:
 
+$$
+\begin{align*}
+x_1 &\geq 0 \\
+x_2 &\geq 0 
+\end{align*}
+$$
 
+# Formulação genérica:
+
+## índices/conjuntos:
+
+$$
+I \colon \text{Conjunto de recursos disponiveis(tempo, equipamentos, etc.), nesse caso, o tempo dedicado ao manejo}, \{1, \dots, m\}
+$$
+
+$$
+J \colon \text{Conjunto de hectares de florestas}, \{1, \ldots, n\}
+$$
+
+## Parâmetros:
+
+$$
+c_j \colon \text{receita por hectare do tipo de floresta } j \in J
+$$
+
+$$
+a_{ij} \colon \text{quantidade do recurso } i  \text{(dias/ha) exigida para o manejo do tipo } j \in J 
+$$
+
+$$
+b_i \colon \text{quantidade total disponivel do recurso } i
+$$
+
+## Variáveis de decisão:
+
+$$
+x_j \colon \text{quantidade de hectares } j \in J \text{ a serem manejados por ano}
+$$
+
+## Modelo matemático:
+
+$$
+\max z = \sum_{j \in J} c_j x_j
+$$
+
+$$
+\text{s.a}
+$$
+
+$$
+\sum_{j \in J} a_{ij} x_j \leq b_i, \quad \forall\, i \in I
+$$
+
+$$
+x_j \geq 0, \quad \forall\, j \in J 
+$$
+
+## Dados de entrada:
+
+```{python}
+
+```
