@@ -130,4 +130,85 @@ $$
 
 ```{python}
 
+# vetor de receita por tipo de floresta
+receita = [90, 120] 
+
+# matriz de quantidade recursos exigida para cada manejo
+tempo_por_manejo = [
+  [2, 3]
+]
+
+# vetor de recurso máximo
+tempo_maximo = [180]
+
+# quantidade de recursos
+n_total_recursos = len(tempo_por_manejo)
+
+# quantidade de florestas a serem manejadas
+n_tipos_florestas = len(receita)
+```
+
+# Resolução do problema
+
+## 1. Importar bibliotecas
+
+```{python}
+import pyomo.environ as pyo
+```
+
+## 2. Importar e definir solver
+
+```{python}
+solver = pyo.SolverFactory("glpk")
+```
+
+## 3. Declarar modelo
+
+```{python}
+modelo = pyo.ConcreteModel()
+
+```
+
+## 4. Declarar índices, parâmetros e variáveis de decisão
+
+### 4.1 Índices
+
+```{python}
+
+```
+
+### 4.2 Parâmetros
+
+```{python}
+
+```
+
+### 4.3 Variáveis de decisão
+
+```{python}
+
+```
+
+## 5. Declarar função objetivo
+
+```{python}
+
+```
+
+## 6. Declarar restrições
+
+```{python}
+
+```
+
+## 7. Resolver modelo
+
+```{python}
+
+```
+
+## 8. Exportar resultados
+
+```{python}
+
 ```
