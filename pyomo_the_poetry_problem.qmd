@@ -85,7 +85,7 @@ I \colon \text{Conjunto de recursos disponiveis(tempo, equipamentos, etc.), ness
 $$
 
 $$
-J \colon \text{Conjunto de hectares de florestas}, \{1, \ldots, n\}
+J \colon \text{Conjunto de tipos de florestas (nativa, plantada, etc.)}, \{1, \ldots, n\}
 $$
 
 ## Parâmetros:
@@ -166,7 +166,6 @@ solver = pyo.SolverFactory("glpk")
 
 ```{python}
 modelo = pyo.ConcreteModel()
-
 ```
 
 ## 4. Declarar índices, parâmetros e variáveis de decisão
@@ -174,41 +173,139 @@ modelo = pyo.ConcreteModel()
 ### 4.1 Índices
 
 ```{python}
-
+modelo.I_recursos = range(n_total_recursos)
+modelo.J_tipos_de_floresta = range(n_tipos_florestas)
 ```
 
 ### 4.2 Parâmetros
 
 ```{python}
+# sintaxe de um dicionário:
+# {chave: valor for item in interável}
 
+# %% Receita por tipo de floresta ==================================
+
+# criar dicionário
+dict_receita = {j: receita[j] for j in modelo.J_tipos_de_floresta}
+
+# declara o parâmetro no modelo
+modelo.c_receita = pyo.Param(
+  modelo.J_tipos_de_floresta,
+  initialize = dict_receita
+)
+
+
+# %% Quantidade do recurso i exigida para o manejo do tipo de floresta j =============
+
+# criar o dicionário
+dict_recurso_x_tipo_floresta = {
+  (i, j): tempo_por_manejo[i][j] 
+  for i in modelo.I_recursos
+  for j in modelo.J_tipos_de_floresta
+}
+
+# declarar o parâmetro no modelo
+modelo.a_recursos_x_floresta = pyo.Param(
+  modelo.I_recursos,
+  modelo.J_tipos_de_floresta,
+  initialize = dict_recurso_x_tipo_floresta
+)
+
+
+# %% Quantidade total do recurso i ==================================
+
+# criar o dicionário
+dict_limite_recurso = {b: tempo_maximo[b] for b in modelo.I_recursos}
+
+# declarar o par6ametro no modelo
+modelo.lim_recurso = pyo.Param(
+  modelo.I_recursos,
+  initialize = dict_limite_recurso
+)
 ```
 
 ### 4.3 Variáveis de decisão
 
 ```{python}
-
+# as variáveis estão associadas ao conjunto J (tipos de florestas) e não podem ser negativas
+modelo.x_variaveis = pyo.Var(
+  modelo.J_tipos_de_floresta,
+  within = pyo.NonNegativeReals
+)
 ```
 
-## 5. Declarar função objetivo
+## 5. Declarar funsção objetivo
 
 ```{python}
+# criar função de apoio para calcular a receita
+def regra_funcao_z(mod):
+  # 1. calcula a receita total: receita do tipo de floresta manejado (R$/ha) * x hectares
+  receita_total = sum(
+    mod.c_receita[j] * mod.x_variaveis[j]
+    for j in mod.J_tipos_de_floresta
+  )
 
+  # 2. retorna o resultaado
+  return receita_total
+
+  
+# declarar função objetivo
+modelo.z = pyo.Objective(
+  rule = regra_funcao_z,
+  sense = pyo.maximize
+)
 ```
 
 ## 6. Declarar restrições
 
 ```{python}
+# criar função para checar o limite de recurso usado (tempo)
+def regra_tempo_disponivel(mod, recurso_i):
+  horas_totais = sum(
+    mod.a_recursos_x_floresta[recurso_i, j] * mod.x_variaveis[j]
+    for j in mod.J_tipos_de_floresta
+  )
+
+  return horas_totais <= mod.lim_recurso[recurso_i]
+    
+
+# declara restrição
+modelo.restricao_limite_recurso = pyo.Constraint(
+  modelo.I_recursos,
+  rule = regra_tempo_disponivel
+)
 
 ```
 
 ## 7. Resolver modelo
 
 ```{python}
+# ver modelo
+modelo.pprint()
+
+
+print("Receita carregada:", {j: pyo.value(modelo.c_receita[j]) for j in modelo.J_tipos_de_floresta})
+print("Tempo por manejo:", {(i,j): pyo.value(modelo.a_recursos_x_floresta[i,j]) for i in modelo.I_recursos for j in modelo.J_tipos_de_floresta})
+print("Limite:", {i: pyo.value(modelo.lim_recurso[i]) for i in modelo.I_recursos})
+
+# resolver modelo
+resultado = solver.solve(modelo)
 
 ```
 
 ## 8. Exportar resultados
 
 ```{python}
+
+# resultado bruto do modelo
+resultado.write
+
+# Função objetivo
+pyo.value(modelo.z)
+
+#modelo.J_tipos_de_floresta
+modelo.x_variaveis[0]()
+modelo.x_variaveis[1]()
+
 
 ```
