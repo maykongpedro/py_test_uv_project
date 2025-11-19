@@ -6,6 +6,12 @@ import pyomo.environ as pyo
 ## 2. Importar e definir solver
 solver = pyo.SolverFactory("glpk")
 
+# windows
+solver = pyo.SolverFactory(
+    _name="glpk", 
+    executable="C:/Users/klmp00145394/Documents/glpk-4.65/w64/glpsol.exe"
+)
+
 ## 3. Declarar modelo
 modelo = pyo.ConcreteModel()
 
@@ -33,5 +39,5 @@ print("\n===== RESULTADOS DO MODELO =====")
 print(f"Status da otimização: {resultado.solver.status}")
 print(f"Condição de término: {resultado.solver.termination_condition}")
 print(f"Receita máxima (z) = R${pyo.value(modelo.z):.2f}")
-print(f"Área manejada de Pinus (x1) = {modelo.x1():.2f} hectares")
-print(f"Área manejada de Nativa (x2) = {modelo.x2():.2f} hectares")
+print(f"Área manejada de Pinus (x1) = {modelo.x1.value:.2f} hectares")
+print(f"Área manejada de Nativa (x2) = {modelo.x2.value:.2f} hectares")
