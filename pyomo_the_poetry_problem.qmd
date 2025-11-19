@@ -1,5 +1,5 @@
 ---
-title: "O problema do Poeta"
+title: "O problema do Poeta - Abordagem generalista"
 format: html
 ---
 
@@ -27,9 +27,6 @@ Como foi mencionado, o desejo do poeta é maximizar a receita advinda da sua pro
 A receita simbolizada por Z pode ser proveniente da floresta de Pinus, ou da floresta nativa, ou de ambas. Portanto, uma opção natural para as variáveis é:
 
 -   $x_1 \colon \text{número de hectares de floresta de Pinus a serem manejados}$
-
-<!-- -->
-
 -   $x_2 \colon \text{número de hectares de floresta nativas a serem manejadas}$
 
 Estas são as incógnitas. Devem ser examinados os valores possíveis de X1 e X2 para tornar o valor de Z o maior possível.
@@ -99,6 +96,10 @@ a_{ij} \colon \text{quantidade do recurso } i  \text{(dias/ha) exigida para o ma
 $$
 
 $$
+A_j \colon \text{area maxima disponivel do tipo de floresta } j \in J
+$$
+
+$$
 b_i \colon \text{quantidade total disponivel do recurso } i
 $$
 
@@ -123,7 +124,11 @@ $$
 $$
 
 $$
-x_j \geq 0, \quad \forall\, j \in J 
+x_j \leq A_j, \quad \forall\ j \in J 
+$$
+
+$$
+x_j \geq 0, \quad \forall\ j \in J 
 $$
 
 ## Dados de entrada:
@@ -137,6 +142,9 @@ receita = [90, 120]
 tempo_por_manejo = [
   [2, 3]
 ]
+
+# vetor de área máxima
+area_max = [40, 50]
 
 # vetor de recurso máximo
 tempo_maximo = [180]
@@ -159,7 +167,13 @@ import pyomo.environ as pyo
 ## 2. Importar e definir solver
 
 ```{python}
-solver = pyo.SolverFactory("glpk")
+# solver = pyo.SolverFactory("glpk")
+
+# windows
+solver = pyo.SolverFactory(
+    _name="glpk", 
+    executable="C:/Users/klmp00145394/Documents/glpk-4.65/w64/glpsol.exe"
+)
 ```
 
 ## 3. Declarar modelo
@@ -212,6 +226,17 @@ modelo.a_recursos_x_floresta = pyo.Param(
 )
 
 
+# %% Área máxima disponível por tipo de floresta j ==================
+
+# criar o dicionário
+dict_area_maxima = {j: area_max[j] for j in modelo.J_tipos_de_floresta}
+
+# declarar o parâmetro no modelo
+modelo.area_maxima = pyo.Param(
+  modelo.J_tipos_de_floresta,
+  initialize = dict_area_maxima
+)
+
 # %% Quantidade total do recurso i ==================================
 
 # criar o dicionário
@@ -259,6 +284,18 @@ modelo.z = pyo.Objective(
 ## 6. Declarar restrições
 
 ```{python}
+
+# criar função para limitar a quantidade de área por tipo de floresta para cada variável
+def regra_area_maxima(mod, j):
+  return mod.x_variaveis[j] <= mod.area_maxima[j]
+
+# declarar restrição
+modelo.restricao_area_maxima = pyo.Constraint(
+  modelo.J_tipos_de_floresta, # sempre relacionar a restrição com os conjuntos
+  rule = regra_area_maxima
+)
+
+  
 # criar função para checar o limite de recurso usado (tempo)
 def regra_tempo_disponivel(mod, recurso_i):
   horas_totais = sum(
@@ -268,10 +305,9 @@ def regra_tempo_disponivel(mod, recurso_i):
 
   return horas_totais <= mod.lim_recurso[recurso_i]
     
-
-# declara restrição
+# declarar restrição
 modelo.restricao_limite_recurso = pyo.Constraint(
-  modelo.I_recursos,
+  modelo.I_recursos,  # sempre relacionar a restrição com os conjuntos
   rule = regra_tempo_disponivel
 )
 
@@ -282,11 +318,6 @@ modelo.restricao_limite_recurso = pyo.Constraint(
 ```{python}
 # ver modelo
 modelo.pprint()
-
-
-print("Receita carregada:", {j: pyo.value(modelo.c_receita[j]) for j in modelo.J_tipos_de_floresta})
-print("Tempo por manejo:", {(i,j): pyo.value(modelo.a_recursos_x_floresta[i,j]) for i in modelo.I_recursos for j in modelo.J_tipos_de_floresta})
-print("Limite:", {i: pyo.value(modelo.lim_recurso[i]) for i in modelo.I_recursos})
 
 # resolver modelo
 resultado = solver.solve(modelo)
@@ -301,11 +332,25 @@ resultado = solver.solve(modelo)
 resultado.write
 
 # Função objetivo
-pyo.value(modelo.z)
+print(f"Receita máxima (z) = R${pyo.value(modelo.z):.2f}")
 
-#modelo.J_tipos_de_floresta
-modelo.x_variaveis[0]()
-modelo.x_variaveis[1]()
+# :.2f
+# : -> iniciar formatação
+# .2 -> duas casas decimais
+# f -> tipo float
+# equilalente à: format(pyo.value(modelo.z), ".2f")
+
+
+# tipos de floresta
+nome_tipos = {
+  0: "Pinus",
+  1: "Nativa"
+}
+
+for j in modelo.J_tipos_de_floresta:
+  nome = nome_tipos[j]
+  valor = modelo.x_variaveis[j].value
+  print(f"Área manejada de {nome}: {valor:.2f} ha")
 
 
 ```
